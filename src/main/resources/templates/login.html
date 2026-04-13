@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인 테스트</title>
+</head>
+<body>
+    <h2>DailyPick 로그인</h2>
+    <form id="userForm">
+        아이디: <input type="text" name="userId"><br>
+        비밀번호: <input type="password" name="password"><br>
+        <button type="button" onclick="sendData()">로그인</button>
+    </form>
+
+    <script>
+        async function sendData() {
+            const formData = new FormData(document.getElementById('userForm'));
+            const data = new URLSearchParams(formData);
+
+            try {
+                const response = await fetch('/api/user/login', {
+                    method: 'POST',
+                    body: data
+                });
+
+                if (!response.ok) {
+                    throw new Error('네트워크 응답이 정상적이지 않습니다.');
+                }
+
+                const result = await response.json();
+
+                if (result.status === "success") {
+                    window.location.href = '/'; 
+                } else {
+                    alert("로그인 실패: " + (result.message || "아이디 또는 비밀번호를 확인하세요."));
+                }
+
+            } catch (error) {
+                console.error("에러 발생:", error);
+                alert("로그인 처리 중 오류가 발생했습니다.");
+            }
+        }
+    </script>
+</body>
+</html>

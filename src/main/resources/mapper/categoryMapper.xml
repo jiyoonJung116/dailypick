@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.dailypick.mapper.CategoryMapper">
+    <resultMap id="CategoryMap" type="com.project.dailypick.dto.CategoryDto">
+        <id property="id" column="id"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="categoryCode" column="category_code"/>
+    </resultMap>
+
+    <resultMap id="UserPreferenceMap" type="com.project.dailypick.dto.UserPreferenceDto">
+        <id property="userIdx" column="user_idx"/>
+        <result property="categoryId" column="category_id"/>    
+    </resultMap>
+
+    <select id="getCategoryList" parameterType="string" resultMap="CategoryMap">
+        SELECT *
+        FROM category
+        <where>
+            <if test="categoryName != null">
+                AND UPPER(category_name) LIKE CONCAT('%', UPPER(#{categoryName}), '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="gethasUserCategory" parameterType="long" resultMap="UserPreferenceMap">
+        SELECT *
+        FROM user_preference
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insertUserCategory" parameterType="java.util.List">
+        INSERT INTO user_preference (user_id, category_id)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.userIdx}, #{item.categoryId})
+        </foreach>
+    </insert>
+</mapper>

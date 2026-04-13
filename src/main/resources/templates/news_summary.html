@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>DailyPick 뉴스 검색 테스트</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
+        .search-box { border: 2px solid #333; padding: 20px; background: #f9f9f9; border-radius: 8px; margin-bottom: 30px; }
+        .row { margin-bottom: 15px; }
+        label { display: inline-block; width: 100px; font-weight: bold; }
+        input[type="text"], select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #333; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        .btn-search { background-color: #28a745; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 4px; width: 100%; font-size: 16px; }
+        .btn-search:hover { background-color: #218838; }
+    </style>
+</head>
+<body>
+
+    <h2>📰 DailyPick 데이터 조회 테스트</h2>
+
+    <div class="search-box">
+        <form id="combinedForm">
+            <div class="row">
+                <label>카테고리</label>
+                <select name="categoryId" id="categorySelect">
+                    <option value="0">전체보기</option>
+                    </select>
+            </div>
+            <div class="row">
+                <label>제목 검색</label>
+                <input type="text" name="title" placeholder="검색할 제목 입력" style="width: 300px;">
+            </div>
+            <div class="row">
+                <label>내용 검색</label>
+                <input type="text" name="content" placeholder="검색할 내용 입력" style="width: 300px;">
+            </div>
+            <div class="row">
+                <label>페이징</label>
+                페이지 <input type="number" name="page" value="0" style="width: 50px;">
+                사이즈 <input type="number" name="size" value="10" style="width: 50px;">
+            </div>
+            <button type="button" class="btn-search" onclick="getNewsList()">조회하기</button>
+        </form>
+    </div>
+
+    <h3>결과 목록 (<span id="countText">0</span>)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>번호</th>
+                <th>카테고리</th>
+                <th>뉴스 제목</th>
+                <th>내용 요약</th>
+            </tr>
+        </thead>
+        <tbody id="newsBody">
+            <tr>
+                <td colspan="4" style="text-align: center;">데이터를 조회해 주세요.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        window.onload = function() {
+            loadCategories();
+        };
+
+        async function loadCategories() {
+            try {
+                const response = await fetch('/category');
+                const result = await response.json();
+
+                if (result.status === "success") {
+                    const select = document.getElementById('categorySelect');
+                    const categories = result.data; 
+
+                    categories.forEach(cat => {
+                        const option = document.createElement('option');
+                        option.value = cat.categoryIdx || cat.id || cat.categoryId; 
+                        option.textContent = cat.categoryName || cat.name;
+                        select.appendChild(option);
+                    });
+                } else {
+                    console.error("카테고리 로드 실패:", result.message);
+                }
+            } catch (error) {
+                console.error("카테고리 API 연결 에러:", error);
+            }
+        }
+
+        // 2. 뉴스 리스트 조회
+        async function getNewsList() {
+            const form = document.getElementById('combinedForm');
+            const formData = new FormData(form);
+            const params = new URLSearchParams(formData);
+
+            try {
+                const response = await fetch('/api/summary/list', {  // ⭐ URL 수정
+                    method: 'POST',                                  // ⭐ POST로 변경
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: params
+                });
+
+                const data = await response.json();
+
+                const tbody = document.getElementById('newsBody');
+                tbody.innerHTML = '';
+
+                const list = data.category_list; // ⭐ 키 맞추기
+                document.getElementById('countText').innerText = list?.length || 0;
+
+                if (Array.isArray(list) && list.length > 0) {
+                    list.forEach(item => {
+                        const row = `<tr>
+                            <td>${item.id || '-'}</td>
+                            <td>${item.categoryName || '-'}</td>
+                            <td><strong>${item.title || ''}</strong></td>
+                            <td>${item.content || ''}</td>
+                        </tr>`;
+                        tbody.innerHTML += row;
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">검색 결과가 없습니다.</td></tr>';
+                }
+
+            } catch (error) {
+                console.error("뉴스 조회 에러:", error);
+                alert("데이터를 가져오는 중 오류가 발생했습니다.");
+            }
+        }
+    </script>
+</body>
+</html>
