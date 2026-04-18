@@ -28,7 +28,7 @@ public class CategoryRestController {
     }
 
     @PostMapping("list")
-    public Map<String, Object> getCategoryList(String categoryName) {
+    public Map<String, Object> getCategoryList(@RequestParam(name = "categoryName", required = false) String categoryName) {
         Map<String, Object> result = new HashMap<>();
         try {
             result.put("status", "success");
@@ -50,7 +50,7 @@ public class CategoryRestController {
         try {
             Long userId = (Long) session.getAttribute("userId");
 
-           List<UserPreferenceDto> list = new ArrayList<>();
+            List<UserPreferenceDto> list = new ArrayList<>();
 
             for (Long categoryId : categories) {
                 UserPreferenceDto dto = new UserPreferenceDto();

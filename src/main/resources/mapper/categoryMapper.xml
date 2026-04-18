@@ -37,4 +37,9 @@
             (#{item.userIdx}, #{item.categoryId})
         </foreach>
     </insert>
+
+    <delete id="deleteUserPreferences" parameterType="long">
+        DELETE FROM user_preference 
+        WHERE user_id = #{userId}
+    </delete>
 </mapper>

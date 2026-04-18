@@ -39,6 +39,11 @@ public class UserService {
 
     public long login(String userId, String password) {
         UserDto user = userMapper.getUserByUserId(userId);
+
+        if (user == null) {
+            return 0;
+        }
+        
         if(passwordEncoder.matches(password, user.getPassword())) {
             return user.getId();
         } else {

@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import tools.jackson.databind.ObjectMapper;
 
+
 @RestController
 @RequestMapping("api/user")
 public class UserRestController {
@@ -24,11 +25,34 @@ public class UserRestController {
         this.userService = userService;
     }
 
+    @PostMapping("info")
+    public Map<String, Object> getUserByUserId(HttpServletRequest request) {
+        Map<String, Object> result = new HashMap<>();
+        HttpSession session = request.getSession();
+
+        try {
+            if (session == null || session.getAttribute("userId") == null) {
+                result.put("status", "error");
+                result.put("message", "로그인이 필요합니다.");
+                return result;
+            }
+            
+            Long userId = Long.parseLong(session.getAttribute("userId").toString());
+            result.put("status", "success");
+            result.put("user_info", userService.getUserById(userId));
+        } catch (Exception e) {
+            result.put("status", "error");
+            result.put("message", e.getMessage());
+        }
+        
+        return result;
+    }
+    
+
     @PostMapping("join")
     public Map<String, Object> userCreate(@ModelAttribute UserDto userDto) {
         Map<String, Object> result = new HashMap<>();
 
-        // 사용자 ID 유효성 검사
         if (userDto.getUserId() == null || userDto.getUserId().isEmpty()) {
             result.put("status", "error");
             result.put("message", "사용자 ID는 필수입니다.");
@@ -77,9 +101,16 @@ public class UserRestController {
         Map<String, Object> result = new HashMap<>();
         HttpSession session = request.getSession();
 
+        if (userDto == null || userDto.getUserId() == null || userDto.getPassword() == null) {
+            result.put("status", "error");
+            result.put("message", "잘못된 요청입니다.");
+            return result;
+        }
+
         try {
             long userIdx = userService.login(userDto.getUserId(), userDto.getPassword());
             result.put("status", userIdx != 0 ? "success" : "error");
+
             if (userIdx == 0) {
                 result.put("error", "아이디 또는 비밀번호가 올바르지 않습니다.");
             } else {
