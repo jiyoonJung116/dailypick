@@ -2,130 +2,177 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>DailyPick 뉴스 검색 테스트</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DailyPick - 뉴스</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <style>
-        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
-        .search-box { border: 2px solid #333; padding: 20px; background: #f9f9f9; border-radius: 8px; margin-bottom: 30px; }
-        .row { margin-bottom: 15px; }
-        label { display: inline-block; width: 100px; font-weight: bold; }
-        input[type="text"], select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background-color: #333; color: white; }
-        tr:nth-child(even) { background-color: #f2f2f2; }
-        .btn-search { background-color: #28a745; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 4px; width: 100%; font-size: 16px; }
-        .btn-search:hover { background-color: #218838; }
+        :root {
+            --primary-color: #222;
+            --accent-color: #d9534f;
+            --bg-color: #f9f9f9;
+            --card-bg: #ffffff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
+        body { background-color: var(--bg-color); color: #333; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+        /* Navigation */
+        .navbar { background: #fff; border-bottom: 1px solid #eee; padding: 15px 0; position: sticky; top: 0; z-index: 100; }
+        .nav-content { display: flex; justify-content: space-between; align-items: center; }
+        .logo img { height: 30px; vertical-align: middle; }
+        .menu a { margin: 0 15px; text-decoration: none; color: #555; font-size: 14px; font-weight: 600; }
+
+        /* Header & Search Section */
+        .page-header { text-align: center; padding: 50px 0 30px; }
+        .page-header h1 { font-size: 32px; margin-bottom: 10px; }
+        .page-header p { color: #777; font-size: 14px; margin-bottom: 30px; }
+
+        .search-container { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 40px; }
+        .search-form { display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end; justify-content: center; }
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        .input-group label { font-size: 12px; font-weight: bold; color: #666; }
+        .input-group input, .input-group select { padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; min-width: 200px; }
+
+        .btn-search { background-color: var(--primary-color); color: white; padding: 10px 25px; border: none; cursor: pointer; border-radius: 6px; font-weight: 600; transition: 0.2s; height: 41px; }
+        .btn-search:hover { background-color: #444; }
+
+        /* Categories */
+        .categories { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 40px; }
+        .cat-btn { padding: 8px 16px; border: none; border-radius: 20px; background: #eee; cursor: pointer; font-size: 13px; transition: 0.3s; }
+        .cat-btn.active { background: var(--primary-color); color: #fff; }
+
+        /* News Grid */
+        .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding-bottom: 50px; }
+        .news-card { background: var(--card-bg); border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s; display: flex; flex-direction: column; }
+        .news-card:hover { transform: translateY(-8px); }
+        
+        .card-img { height: 180px; background-color: #ddd; background-size: cover; background-position: center; }
+        .card-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+        
+        .cat-tag { font-size: 12px; color: var(--accent-color); font-weight: bold; margin-bottom: 8px; }
+        .card-title { font-size: 18px; font-weight: 700; line-height: 1.4; margin-bottom: 10px; color: #111; }
+        .card-date { font-size: 12px; color: #999; margin-bottom: 12px; }
+        .card-desc { font-size: 14px; color: #666; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        .empty-msg { grid-column: 1 / -1; text-align: center; padding: 50px; color: #999; }
     </style>
 </head>
 <body>
 
-    <h2>📰 DailyPick 데이터 조회 테스트</h2>
+    <header class="navbar">
+        <div class="container nav-content">
+            <div class="logo">
+                <strong>DAILYPICK</strong>
+            </div>
+            <nav class="menu">
+                <a href="#">뉴스</a>
+                <a href="#">구독관리</a>
+                <a href="#">알림설정</a>
+            </nav>
+            <div class="icons">🔍 ☰</div>
+        </div>
+    </header>
 
-    <div class="search-box">
-        <form id="combinedForm">
-            <div class="row">
-                <label>카테고리</label>
-                <select name="categoryId" id="categorySelect">
-                    <option value="0">전체보기</option>
-                    </select>
+    <main class="container">
+        <section class="page-header">
+            <h1>뉴스</h1>
+            <p>세상에서 가장 쉬운 경제 뉴스</p>
+            
+            <div class="search-container">
+                <form id="combinedForm" class="search-form">
+                    <div class="input-group">
+                        <label>카테고리</label>
+                        <select name="categoryId" id="categorySelect">
+                            <option value="0">전체보기</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>제목</label>
+                        <input type="text" name="title" placeholder="검색어 입력">
+                    </div>
+                    <div class="input-group">
+                        <label>내용</label>
+                        <input type="text" name="content" placeholder="내용 검색">
+                    </div>
+                    <button type="button" class="btn-search" onclick="getNewsList()">조회하기</button>
+                </form>
             </div>
-            <div class="row">
-                <label>제목 검색</label>
-                <input type="text" name="title" placeholder="검색할 제목 입력" style="width: 300px;">
-            </div>
-            <div class="row">
-                <label>내용 검색</label>
-                <input type="text" name="content" placeholder="검색할 내용 입력" style="width: 300px;">
-            </div>
-            <div class="row">
-                <label>페이징</label>
-                페이지 <input type="number" name="page" value="0" style="width: 50px;">
-                사이즈 <input type="number" name="size" value="10" style="width: 50px;">
-            </div>
-            <button type="button" class="btn-search" onclick="getNewsList()">조회하기</button>
-        </form>
-    </div>
+        </section>
 
-    <h3>결과 목록 (<span id="countText">0</span>)</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>번호</th>
-                <th>카테고리</th>
-                <th>뉴스 제목</th>
-                <th>내용 요약</th>
-            </tr>
-        </thead>
-        <tbody id="newsBody">
-            <tr>
-                <td colspan="4" style="text-align: center;">데이터를 조회해 주세요.</td>
-            </tr>
-        </tbody>
-    </table>
+        <h3>전체 뉴스 (<span id="countText">0</span>)</h3>
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+
+        <section class="news-grid" id="newsBody">
+            <div class="empty-msg">데이터를 조회해 주세요.</div>
+        </section>
+    </main>
 
     <script>
         window.onload = function() {
-            loadCategories();
+            loadCategoryList();
+            getNewsList(); 
         };
 
-        async function loadCategories() {
+        async function loadCategoryList() {
             try {
-                const response = await fetch('/category');
+                const response = await fetch('/api/category/list', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ 'categoryName': '' }) 
+                });
                 const result = await response.json();
 
                 if (result.status === "success") {
                     const select = document.getElementById('categorySelect');
-                    const categories = result.data; 
-
-                    categories.forEach(cat => {
+                    result.category_list.forEach(cat => {
                         const option = document.createElement('option');
-                        option.value = cat.categoryIdx || cat.id || cat.categoryId; 
-                        option.textContent = cat.categoryName || cat.name;
+                        option.value = cat.id; 
+                        option.textContent = cat.categoryName;
                         select.appendChild(option);
                     });
-                } else {
-                    console.error("카테고리 로드 실패:", result.message);
                 }
             } catch (error) {
-                console.error("카테고리 API 연결 에러:", error);
+                console.error("카테고리 로드 실패:", error);
             }
         }
 
-        // 2. 뉴스 리스트 조회
         async function getNewsList() {
             const form = document.getElementById('combinedForm');
             const formData = new FormData(form);
             const params = new URLSearchParams(formData);
 
             try {
-                const response = await fetch('/api/summary/list', {  // ⭐ URL 수정
-                    method: 'POST',                                  // ⭐ POST로 변경
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
+                const response = await fetch('/api/summary/list', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: params
                 });
 
                 const data = await response.json();
+                const grid = document.getElementById('newsBody');
+                grid.innerHTML = '';
 
-                const tbody = document.getElementById('newsBody');
-                tbody.innerHTML = '';
-
-                const list = data.category_list; // ⭐ 키 맞추기
+                const list = data.category_list; 
                 document.getElementById('countText').innerText = list?.length || 0;
 
                 if (Array.isArray(list) && list.length > 0) {
                     list.forEach(item => {
-                        const row = `<tr>
-                            <td>${item.id || '-'}</td>
-                            <td>${item.categoryName || '-'}</td>
-                            <td><strong>${item.title || ''}</strong></td>
-                            <td>${item.content || ''}</td>
-                        </tr>`;
-                        tbody.innerHTML += row;
+                        const card = `
+                            <article class="news-card">
+                                <div class="card-img" style="background-image: url('https://via.placeholder.com/400x250?text=DailyPick')"></div>
+                                <div class="card-body">
+                                    <span class="cat-tag">${item.categoryName || '일반'}</span>
+                                    <h3 class="card-title">${item.title || '제목 없음'}</h3>
+                                    <p class="card-date">2026년 4월 16일 (목)</p> 
+                                    <p class="card-desc">${item.content || '내용이 없습니다.'}</p>
+                                </div>
+                            </article>
+                        `;
+                        grid.innerHTML += card;
                     });
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">검색 결과가 없습니다.</td></tr>';
+                    grid.innerHTML = '<div class="empty-msg">검색 결과가 없습니다.</div>';
                 }
 
             } catch (error) {

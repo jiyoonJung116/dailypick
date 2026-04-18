@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.dailypick.mapper.AlarmSettingMapper">
+    <resultMap id="AlarmSettingMap" type="com.project.dailypick.dto.AlarmSettingDto">
+        <id property="id" column="id"/>
+        <result property="isEmail" column="is_email"/>
+        <result property="isKakao" column="is_kakao"/>
+        <result property="alarmTime" column="alarm_time"/>
+    </resultMap>
+
+    <select id="getAlarmSetting" parameterType="string" resultMap="AlarmSettingMap">
+        SELECT 
+            is_email, is_kakao, alarm_time
+        FROM alarm_setting
+        WHERE user_id = #{userId}
+    </select>
+</mapper>

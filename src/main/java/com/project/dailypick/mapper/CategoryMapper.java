@@ -11,4 +11,6 @@ public interface CategoryMapper {
     List<UserPreferenceDto> gethasUserCategory(long userIdx);
 
     long insertUserCategory(List<UserPreferenceDto> userPreferenceDto);
+
+    void deleteUserPreferences(Long userId);
 }
