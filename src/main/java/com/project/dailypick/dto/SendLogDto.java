@@ -14,4 +14,5 @@ public class SendLogDto {
     private String email;
     private String alarmTime;
     private String isSuccess;
+    private String deliveryDate;
 }
