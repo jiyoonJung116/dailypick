@@ -25,6 +25,11 @@ public class CategoryService {
     }
 
     public long insertUserCategory(List<UserPreferenceDto> userPreferenceDto) {
+        if (userPreferenceDto == null || userPreferenceDto.isEmpty()) return 0L;
+
+        Long userId = userPreferenceDto.get(0).getUserIdx();
+        categoryMapper.deleteUserPreferences(userId);
+
         return categoryMapper.insertUserCategory(userPreferenceDto);
     }
 }

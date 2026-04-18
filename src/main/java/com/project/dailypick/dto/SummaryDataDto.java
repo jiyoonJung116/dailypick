@@ -10,6 +10,7 @@ import lombok.*;
 public class SummaryDataDto {
     private long id;
     private long categoryId;
+    private String categoryName;
     private String title;
     private String content;
     private String createDate;

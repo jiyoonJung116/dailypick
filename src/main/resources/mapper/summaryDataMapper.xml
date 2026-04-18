@@ -6,6 +6,7 @@
     <resultMap id="SummaryDataMap" type="com.project.dailypick.dto.SummaryDataDto">
         <id property="id" column="id"/>
         <result property="categoryId" column="category_id"/>
+        <result property="categoryName" column="category_name"/>
         <result property="title" column="title"/>
         <result property="content" column="content"/>
         <result property="createDate" column="create_date"/>
@@ -18,20 +19,20 @@
             sd.content, 
             nw.link, 
             cg.category_name
-        FROM SummaryData sd
+        FROM summary_data sd
         LEFT JOIN category cg
         ON sd.category_id = cg.id
         LEFT JOIN news nw
         ON sd.news_id = nw.id
         <where>
-            <if test="categoryId != null">
-                AND cg.category_id = #{categoryId}
+            <if test="categoryName != null">
+                AND cg.category_name = #{categoryName}
             </if>
             <if test="title != null">
-                AND UPPER(sd.title) LIKE CONCAT('%', UPPER(#{sd.title}), '%')
+                AND UPPER(sd.title) LIKE CONCAT('%', UPPER(#{title}), '%')
             </if>
             <if test="content != null">
-                AND UPPER(sd.content) LIKE CONCAT('%', UPPER(#{sd.content}), '%')
+                AND UPPER(sd.content) LIKE CONCAT('%', UPPER(#{content}), '%')
             </if>
         </where>
     </select>
