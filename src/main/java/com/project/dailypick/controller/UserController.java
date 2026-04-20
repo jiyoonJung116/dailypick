@@ -72,7 +72,6 @@ public class UserController {
             // 알림 설정 조회
             model.addAttribute("alarm_setting", alarmSettingService.getAlarmSetting(user.getId()));
         } catch (Exception e) {
-            System.out.println("Error in userInfoPage: " + e.getMessage());
             return "redirect:/user/login";
         }
         
