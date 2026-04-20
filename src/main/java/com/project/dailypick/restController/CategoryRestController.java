@@ -43,7 +43,7 @@ public class CategoryRestController {
 
     @PostMapping("insert")
     public Map<String, Object> insertUserCategory(HttpSession session,
-                                                @RequestParam List<Long> categories) {
+                                                @RequestParam(name = "categories") List<Long> categories) {
 
         Map<String, Object> result = new HashMap<>();
 
