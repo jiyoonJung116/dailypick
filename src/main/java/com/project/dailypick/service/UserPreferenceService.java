@@ -1,5 +1,7 @@
 package com.project.dailypick.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.project.dailypick.dto.UserPreferenceDto;
@@ -13,7 +15,7 @@ public class UserPreferenceService {
         this.userPreferenceMapper = userPreferenceMapper;
     }
 
-    public UserPreferenceDto getUserPreference(long userId) {
+    public List<UserPreferenceDto> getUserPreference(long userId) {
         return userPreferenceMapper.getUserPreference(userId);
     }
 }

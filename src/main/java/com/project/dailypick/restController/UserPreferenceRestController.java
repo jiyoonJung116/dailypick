@@ -37,7 +37,7 @@ public class UserPreferenceRestController {
             
             Long userId = Long.parseLong(session.getAttribute("userId").toString());
             result.put("status", "success");
-            result.put("preference_info", userPreferenceService.getUserPreference(userId));
+            result.put("preference_list", userPreferenceService.getUserPreference(userId));
         } catch (Exception e) {
             result.put("status", "error");
             result.put("message", e.getMessage());
