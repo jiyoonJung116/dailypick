@@ -16,4 +16,13 @@ public class AlarmSettingService {
     public AlarmSettingDto getAlarmSetting(long userId) {
         return alarmSettingMapper.getAlarmSetting(userId);
     }
+
+    public void saveAlarmSetting(long userId, String isEmail, String isKakao, String alarmTime) {
+        AlarmSettingDto alarmSetting = alarmSettingMapper.getAlarmSetting(userId);
+        if (alarmSetting == null) {
+            alarmSettingMapper.insertAlarmSetting(userId, isEmail, isKakao, alarmTime);
+        } else {
+            alarmSettingMapper.updateAlarmSetting(userId, isEmail, isKakao, alarmTime);
+        }
+    }
 }

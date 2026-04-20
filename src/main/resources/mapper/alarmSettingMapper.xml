@@ -10,10 +10,31 @@
         <result property="alarmTime" column="alarm_time"/>
     </resultMap>
 
-    <select id="getAlarmSetting" parameterType="string" resultMap="AlarmSettingMap">
+    <select id="getAlarmSetting" resultMap="AlarmSettingMap">
         SELECT 
             is_email, is_kakao, alarm_time
         FROM alarm_setting
         WHERE user_id = #{userId}
     </select>
+
+    <insert id ="insertAlarmSetting" parameterType="com.project.dailypick.dto.AlarmSettingDto">
+        INSERT INTO alarm_setting (user_id, is_email, is_kakao, alarm_time)
+        VALUES (#{userId}, #{isEmail}, #{isKakao}, #{alarmTime})
+    </insert>
+
+    <update id="updateAlarmSetting" parameterType="com.project.dailypick.dto.AlarmSettingDto">
+        UPDATE alarm_setting
+       <set>
+            <if test="isEmail != null">
+                is_email = #{isEmail},
+            </if>
+            <if test="isKakao != null">
+                is_kakao = #{isKakao},
+            </if>
+            <if test="alarmTime != null">
+                alarm_time = #{alarmTime}
+            </if>
+        </set>
+        WHERE user_id = #{userId}
+    </update>
 </mapper>
