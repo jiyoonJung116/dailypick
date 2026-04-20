@@ -12,13 +12,16 @@
 <div class="container">
     <header>
         <div class="logo">
-            <span style="color:#7fb069">🦉</span> DAILYPICK <span style="font-weight: normal; margin-left: 5px; color: #333;">회원페이지</span>
+            <a th:href="@{/}" class="logo" style="text-decoration: none;">
+                <span style="color:#7fb069">🦉</span> 
+                <span class="logo-text" style="color: inherit; font-weight: bold;">DAILYPICK</span>
+                <span style="font-weight: normal; margin-left: 5px; color: #333;">회원페이지</span>
+            </a>
         </div>
         <nav>
-            <a href="#">뉴스</a>
+            <a th:href="@{/summary/list}">뉴스</a>
             <a href="#">구독관리</a>
-            <a href="#">알림설정</a>
-            <a href="#">마이페이지</a>
+            <a th:href="@{/user/info}">마이페이지</a>
         </nav>
     </header>
 

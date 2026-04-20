@@ -15,9 +15,9 @@
                 <strong>DAILYPICK</strong>
             </div>
             <nav class="menu">
-                <a href="#">뉴스</a>
+                <a th:href="@{/summary/list}">뉴스</a>
                 <a href="#">구독관리</a>
-                <a href="#">알림설정</a>
+                <a th:href="@{/user/info}">마이페이지</a>
             </nav>
             <div class="icons">🔍 ☰</div>
         </div>
@@ -33,121 +33,92 @@
                     <div class="input-group">
                         <label>카테고리</label>
                         <select name="categoryId" id="categorySelect">
-                            <option value="0">전체보기</option>
-                            <option th:each="category : ${category_list}" th:value="${category.id}" th:text="${category.categoryName}">
-                                카테고리명
+                            <option value="0" th:selected="${select_category_id == 0}">전체보기</option>
+                            <option th:each="category : ${category_list}" th:value="${category.id}" 
+                                    th:text="${category.categoryName}"
+                                    th:selected="${category.id == select_category_id}">
                             </option>
                         </select>
                     </div>
                     <div class="input-group">
                         <label>제목</label>
-                        <input type="text" name="title" placeholder="검색어 입력">
+                        <input type="text" name="title" th:value="${search_title}" placeholder="검색어 입력">
                     </div>
                     <div class="input-group">
                         <label>내용</label>
-                        <input type="text" name="content" placeholder="내용 검색">
+                        <input type="text" name="content" th:value="${search_content}" placeholder="내용 검색">
                     </div>
-                    <button type="button" class="btn-search" onclick="getNewsList()">조회하기</button>
+                    <form id="combinedForm" class="search-form" action="/summary/list" method="get">
+                        <button type="submit" class="btn-search">조회하기</button>
+                    </form>
                 </form>
             </div>
         </section>
 
-        <h3>전체 뉴스</h3>
+        <h3>전체 뉴스 (<span id="countText" th:text="${total_count ?: 0}">0</span>)</h3>
         <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
 
         <section class="news-grid" id="newsBody">
-            <div class="empty-msg">데이터를 불러오는 중입니다...</div>
-        </section>
+        <th:block th:if="${not #lists.isEmpty(summary_list)}">
+            <article class="news-card" th:each="news : ${summary_list}">
+                <div class="card-img" style="background-image: url('https://via.placeholder.com/400x250?text=DailyPick')"></div>
+                <div class="card-body">
+                    <span class="cat-tag" th:text="${news.categoryName ?: '일반'}"></span>
+                    <h3 class="card-title" th:text="${news.title ?: '제목 없음'}"></h3>
+                    <p class="card-date" th:text="${news.createDate}"></p>
+                    <p class="card-desc" th:text="${news.content ?: '내용이 없습니다.'}"></p>
+                </div>
+            </article>
+        </th:block>
+
+        <div class="empty-msg" th:if="${#lists.isEmpty(summary_list)}">
+            데이터를 조회해 주세요.
+        </div>
+    </section>
     </main>
 
     <script>
-        let currentPage = 0;      
-        let isLastPage = false;  
-        let isLoading = false;
-
-        function getNewsList() {
-            currentPage = 0;     
-            isLastPage = false;
-            isLoading = false;
-            
-            const newsBody = document.getElementById('newsBody');
-            newsBody.innerHTML = '';
-            
-            fetchNews();
-        }
-
-        async function fetchNews() {
-            if (isLoading || isLastPage) return;
-            isLoading = true;
-
+        async function getNewsList() {
             const form = document.getElementById('combinedForm');
             const formData = new FormData(form);
-            const params = new URLSearchParams(formData);
             
-            params.append('page', currentPage);
-            params.append('size', 10);
-
+            const params = new URLSearchParams(formData).toString();
+            
             try {
-                const response = await fetch(`/api/summary/list`, {
-                    method: 'POST', 
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: params.toString() 
-                });
-
+                const response = await fetch(`/summary/api/list?${params}`);
                 const data = await response.json();
-
-                if (data.status === "success") {
-                    const list = data.summary_list;
-                    document.getElementById('countText').textContent = data.total_count || 0;
-
-                    if (list && list.length > 0) {
-                        renderNews(list);
-                        currentPage++;
-                    } else {
-                        if (currentPage === 0) {
-                            document.getElementById('newsBody').innerHTML = '<div class="empty-msg">검색 결과가 없습니다.</div>';
-                        }
-                        isLastPage = true;
-                    }
+                
+                const newsBody = document.getElementById('newsBody');
+                const countText = document.getElementById('countText');
+                
+                countText.innerText = data.length;
+                
+                newsBody.innerHTML = '';
+                
+                if (data.length === 0) {
+                    newsBody.innerHTML = '<div class="empty-msg">검색 결과가 없습니다.</div>';
+                    return;
                 }
+
+                data.forEach(news => {
+                    const card = `
+                        <article class="news-card">
+                            <div class="card-img" style="background-image: url('https://via.placeholder.com/400x250?text=DailyPick')"></div>
+                            <div class="card-body">
+                                <span class="cat-tag">${news.categoryName || '일반'}</span>
+                                <h3 class="card-title">${news.title || '제목 없음'}</h3>
+                                <p class="card-date">${news.createDate}</p>
+                                <p class="card-desc">${news.content || '내용이 없습니다.'}</p>
+                            </div>
+                        </article>
+                    `;
+                    newsBody.insertAdjacentHTML('beforeend', card);
+                });
             } catch (error) {
-                console.error("데이터 로드 실패:", error);
-            } finally {
-                isLoading = false;
+                console.error('Error:', error);
+                alert('데이터를 불러오는 중 오류가 발생했습니다.');
             }
         }
-
-        function renderNews(list) {
-            const newsBody = document.getElementById('newsBody');
-            let html = ""; 
-            
-            list.forEach(news => {
-                html += `
-                    <article class="news-card">
-                        <div class="card-img" style="background-image: url('https://via.placeholder.com/400x250?text=DailyPick')"></div>
-                        <div class="card-body">
-                            <span class="cat-tag">${news.categoryName || '일반'}</span>
-                            <h3 class="card-title">${news.title || '제목 없음'}</h3>
-                            <p class="card-date">${news.createDate || ''}</p> 
-                            <p class="card-desc">${news.content || '내용이 없습니다.'}</p>
-                        </div>
-                    </article>
-                `;
-            });
-            newsBody.insertAdjacentHTML('beforeend', html);
-        }
-
-        window.addEventListener('scroll', () => {
-            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
-                fetchNews();
-            }
-        });
-
-        document.addEventListener("DOMContentLoaded", function() {
-            getNewsList(); 
-        });
     </script>
 </body>
 </html>

@@ -14,7 +14,9 @@
             <div class="logo">DailyPick</div>
             <ul class="nav-links">
                 <li>오늘 브리핑</li>
-                <li><a th:href="@{/summary/list}" style="text-decoration: none; color: inherit;">뉴스 요약</a></li>
+                <li>
+                    <a th:href="@{/summary/list}" style="text-decoration: none; color: inherit;">뉴스 요약</a>
+                </li>
                 <li>가격</li>
                 <th:block th:if="${isLogin == null or !isLogin}">
                     <li><a th:href="@{/user/login}" style="text-decoration: none; color: inherit;">로그인</a></li>
@@ -26,7 +28,9 @@
                             <span th:text="${userName}">사용자</span>님
                         </a>
                     </li>
-                    <li><a th:href="@{/user/logout}" style="text-decoration: none; color: inherit; font-size: 12px; color: #888;">로그아웃</a></li>
+                    <li>
+                        <a th:href="@{/user/logout}" style="text-decoration: none; color: inherit; font-size: 12px; color: #888;">로그아웃</a>
+                    </li>
                 </th:block>
             </ul>
         </nav>
