@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.dailypick.dto.UserDto;
+import com.project.dailypick.service.AlarmSettingService;
 import com.project.dailypick.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,9 +21,11 @@ import tools.jackson.databind.ObjectMapper;
 @RequestMapping("api/user")
 public class UserRestController {
     private final UserService userService;
+    private final AlarmSettingService alarmSettingService;
 
-    public UserRestController(UserService userService) {
+    public UserRestController(UserService userService, AlarmSettingService alarmSettingService) {
         this.userService = userService;
+        this.alarmSettingService = alarmSettingService;
     }
 
     @PostMapping("info")
@@ -85,6 +88,7 @@ public class UserRestController {
 
         try {   
             Long userIdx = userService.createUser(userDto);
+            alarmSettingService.saveAlarmSetting(userIdx, "F", "F", "09:00:00");
             result.put("status", "success");
             result.put("userIdx", userIdx);
         } catch (Exception e) {
