@@ -5,58 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DailyPick - 뉴스</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
-    <style>
-        :root {
-            --primary-color: #222;
-            --accent-color: #d9534f;
-            --bg-color: #f9f9f9;
-            --card-bg: #ffffff;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
-        body { background-color: var(--bg-color); color: #333; }
-        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
-
-        /* Navigation */
-        .navbar { background: #fff; border-bottom: 1px solid #eee; padding: 15px 0; position: sticky; top: 0; z-index: 100; }
-        .nav-content { display: flex; justify-content: space-between; align-items: center; }
-        .logo img { height: 30px; vertical-align: middle; }
-        .menu a { margin: 0 15px; text-decoration: none; color: #555; font-size: 14px; font-weight: 600; }
-
-        /* Header & Search Section */
-        .page-header { text-align: center; padding: 50px 0 30px; }
-        .page-header h1 { font-size: 32px; margin-bottom: 10px; }
-        .page-header p { color: #777; font-size: 14px; margin-bottom: 30px; }
-
-        .search-container { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 40px; }
-        .search-form { display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end; justify-content: center; }
-        .input-group { display: flex; flex-direction: column; gap: 5px; }
-        .input-group label { font-size: 12px; font-weight: bold; color: #666; }
-        .input-group input, .input-group select { padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; min-width: 200px; }
-
-        .btn-search { background-color: var(--primary-color); color: white; padding: 10px 25px; border: none; cursor: pointer; border-radius: 6px; font-weight: 600; transition: 0.2s; height: 41px; }
-        .btn-search:hover { background-color: #444; }
-
-        /* Categories */
-        .categories { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 40px; }
-        .cat-btn { padding: 8px 16px; border: none; border-radius: 20px; background: #eee; cursor: pointer; font-size: 13px; transition: 0.3s; }
-        .cat-btn.active { background: var(--primary-color); color: #fff; }
-
-        /* News Grid */
-        .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding-bottom: 50px; }
-        .news-card { background: var(--card-bg); border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s; display: flex; flex-direction: column; }
-        .news-card:hover { transform: translateY(-8px); }
-        
-        .card-img { height: 180px; background-color: #ddd; background-size: cover; background-position: center; }
-        .card-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
-        
-        .cat-tag { font-size: 12px; color: var(--accent-color); font-weight: bold; margin-bottom: 8px; }
-        .card-title { font-size: 18px; font-weight: 700; line-height: 1.4; margin-bottom: 10px; color: #111; }
-        .card-date { font-size: 12px; color: #999; margin-bottom: 12px; }
-        .card-desc { font-size: 14px; color: #666; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-        
-        .empty-msg { grid-column: 1 / -1; text-align: center; padding: 50px; color: #999; }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/news_summary.css}">
 </head>
 <body>
 
