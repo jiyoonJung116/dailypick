@@ -15,7 +15,7 @@ public class SummaryDataService {
         this.summaryDataMapper = summaryDataMapper;
     }
 
-    public List<SummaryDataDto> getSummaryList(String categoryName, String title, String content) {
-        return summaryDataMapper.getSummaryList(categoryName, title, content);
+    public List<SummaryDataDto> getSummaryList(long categoryId, String title, String content, int page, int size) {
+        return summaryDataMapper.getSummaryList(categoryId, title, content, page * size, size);
     }
 }

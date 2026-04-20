@@ -25,8 +25,8 @@
         LEFT JOIN news nw
         ON sd.news_id = nw.id
         <where>
-            <if test="categoryName != null">
-                AND cg.category_name = #{categoryName}
+            <if test="categoryId != null and categoryId != 0">
+                AND sd.category_id = #{categoryId}
             </if>
             <if test="title != null">
                 AND UPPER(sd.title) LIKE CONCAT('%', UPPER(#{title}), '%')
@@ -35,5 +35,7 @@
                 AND UPPER(sd.content) LIKE CONCAT('%', UPPER(#{content}), '%')
             </if>
         </where>
+        ORDER BY sd.id DESC
+        LIMIT #{offset}, #{size}
     </select>
 </mapper>

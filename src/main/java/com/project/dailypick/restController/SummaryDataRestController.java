@@ -20,13 +20,15 @@ public class SummaryDataRestController {
     }
 
     @PostMapping("list")
-    public Map<String, Object> getSummaryList(@RequestParam(name = "categoryName", required = false) String categoryName,
-                                                @RequestParam(name = "title", required = false) String title,
-                                                @RequestParam(name = "content", required = false) String content) {
+    public Map<String, Object> getSummaryList(@RequestParam(name = "categoryId") int categoryId,
+                                                @RequestParam(name = "title") String title,
+                                                @RequestParam(name = "content") String content,
+                                                @RequestParam(name = "page", defaultValue = "0") int page,
+                                                @RequestParam(name = "size", defaultValue = "10") int size) {
         Map<String, Object> result = new HashMap<>();
         try {
             result.put("status", "success");
-            result.put("category_list", summaryDataService.getSummaryList(categoryName, title, content));
+            result.put("summary_list", summaryDataService.getSummaryList(categoryId, title, content, page, size));
         } catch (Exception e) {
             result.put("status", "error");
             result.put("message", e.getMessage());

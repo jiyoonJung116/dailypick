@@ -34,6 +34,9 @@
                         <label>카테고리</label>
                         <select name="categoryId" id="categorySelect">
                             <option value="0">전체보기</option>
+                            <option th:each="category : ${category_list}" th:value="${category.id}" th:text="${category.categoryName}">
+                                카테고리명
+                            </option>
                         </select>
                     </div>
                     <div class="input-group">
@@ -49,86 +52,102 @@
             </div>
         </section>
 
-        <h3>전체 뉴스 (<span id="countText">0</span>)</h3>
+        <h3>전체 뉴스</h3>
         <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
 
         <section class="news-grid" id="newsBody">
-            <div class="empty-msg">데이터를 조회해 주세요.</div>
+            <div class="empty-msg">데이터를 불러오는 중입니다...</div>
         </section>
     </main>
 
     <script>
-        window.onload = function() {
-            loadCategoryList();
-            getNewsList(); 
-        };
+        let currentPage = 0;      
+        let isLastPage = false;  
+        let isLoading = false;
 
-        async function loadCategoryList() {
-            try {
-                const response = await fetch('/api/category/list', { 
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams({ 'categoryName': '' }) 
-                });
-                const result = await response.json();
-
-                if (result.status === "success") {
-                    const select = document.getElementById('categorySelect');
-                    result.category_list.forEach(cat => {
-                        const option = document.createElement('option');
-                        option.value = cat.id; 
-                        option.textContent = cat.categoryName;
-                        select.appendChild(option);
-                    });
-                }
-            } catch (error) {
-                console.error("카테고리 로드 실패:", error);
-            }
+        function getNewsList() {
+            currentPage = 0;     
+            isLastPage = false;
+            isLoading = false;
+            
+            const newsBody = document.getElementById('newsBody');
+            newsBody.innerHTML = '';
+            
+            fetchNews();
         }
 
-        async function getNewsList() {
+        async function fetchNews() {
+            if (isLoading || isLastPage) return;
+            isLoading = true;
+
             const form = document.getElementById('combinedForm');
             const formData = new FormData(form);
             const params = new URLSearchParams(formData);
+            
+            params.append('page', currentPage);
+            params.append('size', 10);
 
             try {
-                const response = await fetch('/api/summary/list', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: params
+                const response = await fetch(`/api/summary/list`, {
+                    method: 'POST', 
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: params.toString() 
                 });
 
                 const data = await response.json();
-                const grid = document.getElementById('newsBody');
-                grid.innerHTML = '';
 
-                const list = data.category_list; 
-                document.getElementById('countText').innerText = list?.length || 0;
+                if (data.status === "success") {
+                    const list = data.summary_list;
+                    document.getElementById('countText').textContent = data.total_count || 0;
 
-                if (Array.isArray(list) && list.length > 0) {
-                    list.forEach(item => {
-                        const card = `
-                            <article class="news-card">
-                                <div class="card-img" style="background-image: url('https://via.placeholder.com/400x250?text=DailyPick')"></div>
-                                <div class="card-body">
-                                    <span class="cat-tag">${item.categoryName || '일반'}</span>
-                                    <h3 class="card-title">${item.title || '제목 없음'}</h3>
-                                    <p class="card-date">2026년 4월 16일 (목)</p> 
-                                    <p class="card-desc">${item.content || '내용이 없습니다.'}</p>
-                                </div>
-                            </article>
-                        `;
-                        grid.innerHTML += card;
-                    });
-                } else {
-                    grid.innerHTML = '<div class="empty-msg">검색 결과가 없습니다.</div>';
+                    if (list && list.length > 0) {
+                        renderNews(list);
+                        currentPage++;
+                    } else {
+                        if (currentPage === 0) {
+                            document.getElementById('newsBody').innerHTML = '<div class="empty-msg">검색 결과가 없습니다.</div>';
+                        }
+                        isLastPage = true;
+                    }
                 }
-
             } catch (error) {
-                console.error("뉴스 조회 에러:", error);
-                alert("데이터를 가져오는 중 오류가 발생했습니다.");
+                console.error("데이터 로드 실패:", error);
+            } finally {
+                isLoading = false;
             }
         }
+
+        function renderNews(list) {
+            const newsBody = document.getElementById('newsBody');
+            let html = ""; 
+            
+            list.forEach(news => {
+                html += `
+                    <article class="news-card">
+                        <div class="card-img" style="background-image: url('https://via.placeholder.com/400x250?text=DailyPick')"></div>
+                        <div class="card-body">
+                            <span class="cat-tag">${news.categoryName || '일반'}</span>
+                            <h3 class="card-title">${news.title || '제목 없음'}</h3>
+                            <p class="card-date">${news.createDate || ''}</p> 
+                            <p class="card-desc">${news.content || '내용이 없습니다.'}</p>
+                        </div>
+                    </article>
+                `;
+            });
+            newsBody.insertAdjacentHTML('beforeend', html);
+        }
+
+        window.addEventListener('scroll', () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
+                fetchNews();
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            getNewsList(); 
+        });
     </script>
 </body>
 </html>

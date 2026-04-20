@@ -9,5 +9,10 @@ import com.project.dailypick.dto.SummaryDataDto;
 
 @Mapper
 public interface SummaryDataMapper {
-    List<SummaryDataDto> getSummaryList(@Param("categoryName") String categoryName, @Param("title") String title, @Param("content") String content);
+    List<SummaryDataDto> getSummaryList(@Param("categoryId") long categoryId,
+                                        @Param("title") String title,
+                                        @Param("content") String content,
+                                        @Param("offset") int offset,
+                                        @Param("size") int size
+    );
 }
