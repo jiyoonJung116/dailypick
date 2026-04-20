@@ -5,157 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DAILYPICK 회원페이지</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {
-            --bg-color: #f9f7f9;
-            --card-bg: #ffffff;
-            --primary-purple: #9b89b3;
-            --light-purple: #f3f0f7;
-            --text-dark: #333;
-            --text-gray: #666;
-            --accent-green: #70d6b0;
-        }
-
-        body {
-            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 20px;
-            color: var(--text-dark);
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-
-        /* 헤더 섹션 */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--primary-purple);
-        }
-
-        .logo img {
-            width: 40px;
-            margin-right: 10px;
-        }
-
-        nav a {
-            margin-left: 20px;
-            text-decoration: none;
-            color: var(--text-gray);
-            font-size: 14px;
-        }
-
-        /* 공통 카드 스타일 */
-        .card {
-            background: var(--light-purple);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-        }
-
-        .card-title {
-            display: flex;
-            align-items: center;
-            font-weight: bold;
-            margin-bottom: 20px;
-            font-size: 18px;
-        }
-
-        .card-title i {
-            background: var(--primary-purple);
-            color: white;
-            padding: 8px;
-            border-radius: 50%;
-            margin-right: 10px;
-            font-size: 14px;
-        }
-
-        /* 회원 정보 */
-        .info-list { line-height: 2; list-style: none; padding: 0; margin: 0; }
-        .info-list span { font-weight: bold; }
-
-        /* 관심 분야 설정 (그리드) */
-        .interest-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-        }
-
-        .checkbox-group { display: flex; align-items: center; cursor: pointer; }
-        .checkbox-group input { margin-right: 8px; accent-color: var(--accent-green); width: 18px; height: 18px; }
-
-        .btn-save {
-            display: block;
-            margin-left: auto;
-            background: var(--primary-purple);
-            color: white;
-            border: none;
-            padding: 10px 25px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        /* 하단 레이아웃 (알림 & 구독) */
-        .bottom-row {
-            display: grid;
-            grid-template-columns: 1fr 1.2fr;
-            gap: 20px;
-        }
-
-        /* 알림 설정 내 토글 버튼 */
-        .toggle-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .status-badge {
-            background: var(--accent-green);
-            color: white;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        /* 구독 관리 버튼들 */
-        .sub-btns {
-            display: flex;
-            gap: 8px;
-            margin-top: 15px;
-        }
-        .sub-btns button {
-            flex: 1;
-            padding: 8px 0;
-            border: 1px solid #ddd;
-            background: white;
-            border-radius: 5px;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        @media (max-width: 600px) {
-            .bottom-row { grid-template-columns: 1fr; }
-            .interest-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/info.css}">
 </head>
 <body>
 
@@ -175,10 +25,10 @@
     <section class="card">
         <div class="card-title"><i class="fas fa-user"></i> 회원 정보</div>
         <ul class="info-list">
-            <li>이름 : <span id="info-name">로딩 중...</span></li>
-            <li>이메일 : <span id="info-email">-</span></li>
-            <li>가입일 : <span id="info-date">-</span></li>
-            <li>구독여부 : <span id="info-sub">-</span></li>
+            <li>이름 : <span id="info-name" th:text="${user_info.userName}"></span></li>
+            <li>이메일 : <span id="info-email" th:text="${user_info.email}"></span></li>
+            <li>가입일 : <span id="info-date" th:text="${user_info.createDate}"></span></li>
+            <li>구독여부 : <span id="info-sub" th:text="${user_info.isSubscribe == 'T' ? 'O' : 'X'}"></span></li>
         </ul>
     </section>
 
@@ -187,7 +37,10 @@
             <i class="fas fa-star"></i> 관심 뉴스 분야 설정 ⭐
         </div>
         <div class="interest-grid" id="category-container">
-            <p style="color: #999;">카테고리 로딩 중...</p>
+            <label th:each="category : ${category_list}">
+                <input type="checkbox" name="categories" th:value="${category.id}" th:checked="${user_category_list.contains(category.id)}">
+                <span th:text="${category.categoryName}"></span>
+            </label>
         </div>
         <button class="btn-save" onclick="saveCategory()">저장하기</button>
     </section>
@@ -197,11 +50,19 @@
             <div class="card-title"><i class="fas fa-bell"></i> 알림 연동 설정</div>
             <div class="toggle-item">
                 <span>📧 이메일 뉴스레터</span>
-                <span class="status-badge" id="email-alarm-status">OFF</span>
+                <span class="status-badge" id="email-alarm-status"
+                    th:text="${alarm_setting.isEmail == 'T' ? 'ON' : 'OFF'}"
+                    th:style="'background:' + (${alarm_setting.isEmail == 'T' ? '#70d6b0' : '#ccc'})"
+                    onclick="toggleAlarm('email')"> OFF
+                </span>
             </div>
             <div class="toggle-item">
                 <span>💬 카카오톡 알림</span>
-                <span class="status-badge" id="kakao-alarm-status">OFF</span>
+                <span class="status-badge" id="kakao-alarm-status"
+                    th:text="${alarm_setting.isKakao == 'T' ? 'ON' : 'OFF'}"
+                    th:style="'background:' + (${alarm_setting.isKakao == 'T' ? '#70d6b0' : '#ccc'})"
+                    onclick="toggleAlarm('kakao')"> OFF
+                </span>
             </div>
         </section>
 
@@ -222,114 +83,74 @@
     </div>
 </div>
 
-<script>
+<script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function() {
         fetch('/api/user/info', {
             method: 'POST',
             cache: 'no-cache'
         })
         .then(response => {
-            if (!response.ok) {
-                throw response;
-            }
+            if (!response.ok) throw response;
             return response.json();
         })
         .then(data => {
             if (data.status === "success") {
                 const user = data.user_info;
-                
                 document.getElementById('info-name').textContent = user.userName || '이름 없음';
                 document.getElementById('info-email').textContent = user.email || '-';
                 document.getElementById('info-date').textContent = user.createDate || '-'; 
                 document.getElementById('info-sub').textContent = (user.isSubscribe === 'T') ? 'O' : 'X';
                 
-                if(document.getElementById('plan-name')) {
-                    document.getElementById('plan-name').textContent = (user.isSubscribe === 'T') ? 'Premium' : '일반';
-                }
-            } else {
-                alert(data.message);
-            }
-        })
-        .catch(error => {
-            console.error("호출 실패! 경로를 확인하세요:", error);
-        });
-
-        // 카테고리 종류
-        Promise.all([
-            fetch('/api/category/list', { method: 'POST' }).then(res => res.json()),
-            fetch('/api/user/preference/info', { method: 'POST' }).then(res => res.json()),
-            fetch('/api/alarm/setting', { method: 'POST' }).then(res => res.json())
-        ])
-        .then(([categoryData, preferenceData, alarmData]) => {
-            if (categoryData.status === "success" && preferenceData.status === "success") {
-                const allCategories = categoryData.category_list;
-                const prefInfo = preferenceData.preference_info;
-
-                const userPrefIds = new Set();
-                
-                if (prefInfo) {
-                    if (Array.isArray(prefInfo)) {
-                        prefInfo.forEach(p => userPrefIds.add(p.categoryId));
-                    } else {
-                        userPrefIds.add(prefInfo.categoryId);
-                    }
-                }
-
-                renderCategories(allCategories, userPrefIds);
-            } else {
-                document.getElementById('category-container').innerHTML = '<p>데이터를 불러오지 못했습니다.</p>';
-            }
-
-            if (alarmData.status === "success") {
-                const alarm = alarmData.alarm_info;
-                
-                // 이메일 알림 처리
-                const emailStatus = document.getElementById('email-alarm-status');
-                if (alarm.emailYn === 'T') {
-                    emailStatus.textContent = 'ON';
-                    emailStatus.style.background = '#70d6b0'; // ON일 때 초록색
-                } else {
-                    emailStatus.textContent = 'OFF';
-                    emailStatus.style.background = '#ccc';    // OFF일 때 회색
-                }
-
-                // 카카오톡 알림 처리
-                const kakaoStatus = document.getElementById('kakao-alarm-status');
-                if (alarm.kakaoYn === 'T') {
-                    kakaoStatus.textContent = 'ON';
-                    kakaoStatus.style.background = '#70d6b0';
-                } else {
-                    kakaoStatus.textContent = 'OFF';
-                    kakaoStatus.style.background = '#ccc';
+                const planName = document.getElementById('plan-name');
+                if(planName) {
+                    planName.textContent = (user.isSubscribe === 'T') ? 'Premium' : '일반';
                 }
             }
         })
-        .catch(error => {
-            console.error("연결 오류:", error);
-            document.getElementById('category-container').innerHTML = '<p>서버 연결 오류가 발생했습니다.</p>';
-        });
+        .catch(error => console.error("초기 데이터 로드 실패:", error));
     });
 
-    function renderCategories(categories, userPrefIds) {
-        const container = document.getElementById('category-container');
-        container.innerHTML = ''; 
+    function toggleAlarm(type) {
+        const statusBadge = document.getElementById(type + '-alarm-status');
+        const isCurrentOn = statusBadge.textContent.trim() === 'ON';
+        
+        const newStatus = isCurrentOn ? 'F' : 'T';
+        const newText = isCurrentOn ? 'OFF' : 'ON';
+        const newColor = isCurrentOn ? '#ccc' : '#70d6b0';
 
-        categories.forEach(cat => {
-            const isChecked = userPrefIds.has(cat.id) ? 'checked' : '';
+        updateAlarmStatus(type, newStatus).then(success => {
+            if (success) {
+                statusBadge.textContent = newText;
+                statusBadge.style.background = newColor;
+            } else {
+                alert("설정 변경에 실패했습니다. 다시 시도해주세요.");
+            }
+        });
+    }
 
-            const label = document.createElement('label');
-            label.className = 'checkbox-group';
-            label.innerHTML = `
-                <input type="checkbox" name="categories" value="${cat.id}" ${isChecked}>
-                ${cat.categoryName}
-            `;
-            container.appendChild(label);
+    function updateAlarmStatus(type, newStatus) {
+        const formData = new URLSearchParams();
+        formData.append('type', type);
+        formData.append('status', newStatus);
+
+        return fetch('/api/alarm/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Network error');
+            return response.json(); 
+        })
+        .then(data => data.status === 'success')
+        .catch(error => {
+            console.error('요청 실패:', error);
+            return false;
         });
     }
 
     function saveCategory() {
         const checkedBoxes = document.querySelectorAll('input[name="categories"]:checked');
-        
         const selectedIds = Array.from(checkedBoxes).map(box => box.value);
 
         if (selectedIds.length === 0) {
@@ -340,12 +161,9 @@
         const params = new URLSearchParams();
         selectedIds.forEach(id => params.append('categories', id));
 
-        // 4. fetch 요청
         fetch('/api/category/insert', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: params
         })
         .then(response => response.json())

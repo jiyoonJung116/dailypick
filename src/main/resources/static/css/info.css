@@ -1,0 +1,149 @@
+:root {
+    --bg-color: #f9f7f9;
+    --card-bg: #ffffff;
+    --primary-purple: #9b89b3;
+    --light-purple: #f3f0f7;
+    --text-dark: #333;
+    --text-gray: #666;
+    --accent-green: #70d6b0;
+}
+
+body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    background-color: var(--bg-color);
+    margin: 0;
+    padding: 20px;
+    color: var(--text-dark);
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+/* 헤더 섹션 */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--primary-purple);
+}
+
+.logo img {
+    width: 40px;
+    margin-right: 10px;
+}
+
+nav a {
+    margin-left: 20px;
+    text-decoration: none;
+    color: var(--text-gray);
+    font-size: 14px;
+}
+
+/* 공통 카드 스타일 */
+.card {
+    background: var(--light-purple);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 20px;
+}
+
+.card-title {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+
+.card-title i {
+    background: var(--primary-purple);
+    color: white;
+    padding: 8px;
+    border-radius: 50%;
+    margin-right: 10px;
+    font-size: 14px;
+}
+
+/* 회원 정보 */
+.info-list { line-height: 2; list-style: none; padding: 0; margin: 0; }
+.info-list span { font-weight: bold; }
+
+/* 관심 분야 설정 (그리드) */
+.interest-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.checkbox-group { display: flex; align-items: center; cursor: pointer; }
+.checkbox-group input { margin-right: 8px; accent-color: var(--accent-green); width: 18px; height: 18px; }
+
+.btn-save {
+    display: block;
+    margin-left: auto;
+    background: var(--primary-purple);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+/* 하단 레이아웃 (알림 & 구독) */
+.bottom-row {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 20px;
+}
+
+/* 알림 설정 내 토글 버튼 */
+.toggle-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.status-badge {
+    background: var(--accent-green);
+    color: white;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* 구독 관리 버튼들 */
+.sub-btns {
+    display: flex;
+    gap: 8px;
+    margin-top: 15px;
+}
+.sub-btns button {
+    flex: 1;
+    padding: 8px 0;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 5px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    .bottom-row { grid-template-columns: 1fr; }
+    .interest-grid { grid-template-columns: repeat(2, 1fr); }
+}
