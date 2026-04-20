@@ -9,20 +9,18 @@
     <link rel="stylesheet" th:href="@{/css/send_log.css}">
 </head>
 <body>
-
     <header class="navbar">
         <div class="nav-container">
-            <a href="#" class="logo">
+            <a th:href="@{/log/list}" class="logo">
                 <span class="logo-text">DAILYPICK <span>메일 이력</span></span>
             </a>
             <nav class="menu">
-                <a href="#">뉴스</a>
+                <a th:href="@{/summary/list}">뉴스</a>
                 <a href="#">구독관리</a>
-                <a href="#">알림설정</a>
+                <a th:href="@{/user/info}">마이페이지</a>
             </nav>
         </div>
     </header>
-
     <main class="content-container">
         <section class="page-header">
             <h1>메일 발송 이력 조회</h1>
@@ -31,10 +29,6 @@
 
         <section class="filter-bar">
             <form id="mailLogForm" class="search-form">
-                <div class="input-group">
-                    <label>수신자 메일</label>
-                    <input type="text" name="email" placeholder="example@gmail.com" style="flex-grow: 1;">
-                </div>
                 <div class="input-group">
                     <label>발송 상태</label>
                     <select name="isSuccess" id="statusSelect">
@@ -61,8 +55,16 @@
                 </tr>
             </thead>
             <tbody id="mailLogBody">
-                <tr>
-                    <td colspan="4" style="text-align: center; color: #999;">이력을 조회해 주세요.</td>
+                <tr th:each="log : ${send_log_list}">
+                    <td class="id-cell" th:text="${log.id ?: '-'}"></td>
+                    <td style="font-weight: 500;" th:text="${log.email ?: '-'}"></td>
+                    <td>
+                        <span class="status-badge" 
+                            th:classappend="${log.isSuccess == 'Y' ? 'status-success' : 'status-fail'}" 
+                            th:text="${log.isSuccess == 'Y' ? '성공' : '실패'}">
+                        </span>
+                    </td>
+                    <td class="date-cell" th:text="${log.deliveryDate ?: '-'}"></td>
                 </tr>
             </tbody>
         </table>
@@ -72,104 +74,71 @@
     </main>
 
     <script>
-        let currentPage = 0;
-        let pageSize = 10;
+        let currentPage = 1;
+        const size = 10;
+        let isLastPage = false;
         let isLoading = false;
-        let isLast = false;
-        let totalCount = 0;
 
-        async function getMailLogs(reset = false) {
-            if (isLoading || (isLast && !reset)) return;
+        const logBody = document.getElementById('mailLogBody');
+        const statusSelect = document.getElementById('statusSelect');
+        const searchBtn = document.getElementById('searchBtn');
+        const loadingTrigger = document.getElementById('loadingTrigger');
+
+        function renderLogs(logs, isAppend = true) {
+            if (!isAppend) logBody.innerHTML = '';
             
-            isLoading = true;
-            const form = document.getElementById('mailLogForm');
-            const formData = new FormData(form);
-            const tbody = document.getElementById('mailLogBody');
-            const loadingTrigger = document.getElementById('loadingTrigger');
-
-            if (reset) {
-                currentPage = 0;
-                isLast = false;
-                totalCount = 0;
-                tbody.innerHTML = '';
-                document.getElementById('countText').innerText = 0;
-            }
-
-            loadingTrigger.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 데이터를 불러오는 중...';
-
-            formData.set("page", currentPage);
-            formData.set("size", pageSize);
-
-            const params = new URLSearchParams(formData.entries());
-
-            try {
-                const response = await fetch('/api/log/list', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: params.toString()
-                });
-
-                const data = await response.json();
-                const list = data.send_log_list;
-
-                if (!Array.isArray(list) || list.length === 0) {
-                    if (currentPage === 0) {
-                        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 40px;">발송 이력이 없습니다.</td></tr>';
-                    }
-                    isLast = true;
-                    loadingTrigger.innerHTML = '모든 내역을 불러왔습니다.';
-                    return;
-                }
-
-                if (currentPage === 0) tbody.innerHTML = '';
-
-                list.forEach(item => {
-                    const statusClass = item.isSuccess === "Y" ? 'status-success' : 'status-fail';
-                    const statusText = item.isSuccess === "Y" ? '성공' : '실패';
-
-                    const row = `
-                        <tr>
-                            <td class="id-cell">${item.id || '-'}</td>
-                            <td style="font-weight: 500;">${item.email || '-'}</td>
-                            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                            <td class="date-cell">${item.deliveryDate || '-'}</td>
-                        </tr>`;
-                    tbody.insertAdjacentHTML('beforeend', row);
-                });
-
-                totalCount += list.length;
-                document.getElementById('countText').innerText = totalCount;
-
-                if (list.length < pageSize) {
-                    isLast = true;
-                    loadingTrigger.innerHTML = '마지막 페이지입니다.';
-                } else {
-                    loadingTrigger.innerHTML = '';
-                }
-
-                currentPage++;
-
-            } catch (error) {
-                console.error("메일 이력 조회 에러:", error);
-                loadingTrigger.innerHTML = '데이터를 불러오는 중 오류가 발생했습니다.';
-            } finally {
-                isLoading = false;
-            }
+            logs.forEach(log => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="id-cell">${log.id || '-'}</td>
+                    <td style="font-weight: 500;">${log.email || '-'}</td>
+                    <td>
+                        <span class="status-badge ${log.isSuccess === 'Y' ? 'status-success' : 'status-fail'}">
+                            ${log.isSuccess === 'Y' ? '성공' : '실패'}
+                        </span>
+                    </td>
+                    <td class="date-cell">${log.deliveryDate || '-'}</td>
+                `;
+                logBody.appendChild(tr);
+            });
+            
+            document.getElementById('countText').innerText = logBody.children.length;
         }
 
-        // 검색 버튼 클릭 이벤트
-        document.getElementById('searchBtn').addEventListener('click', () => {
-            getMailLogs(true);
+        async function fetchLogs(page) {
+            if (isLoading || isLastPage) return;
+            isLoading = true;
+
+            const isSuccess = statusSelect.value;
+            const response = await fetch(`/log/api/list?isSuccess=${isSuccess}&page=${page}&size=${size}`);
+            const data = await response.json();
+
+            if (data.length < size) isLastPage = true;
+            
+            renderLogs(data, true);
+            isLoading = false;
+        }
+
+        searchBtn.addEventListener('click', async () => {
+            currentPage = 0;
+            isLastPage = false;
+            
+            const isSuccess = statusSelect.value;
+            const response = await fetch(`/log/api/list?isSuccess=${isSuccess}&page=${currentPage}&size=${size}`);
+            const data = await response.json();
+            
+            renderLogs(data, false);
+            currentPage++;
         });
 
-        // 무한 스크롤 로직
-        window.addEventListener('scroll', () => {
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
-                getMailLogs();
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && !isLoading && !isLastPage) {
+                fetchLogs(currentPage);
+                currentPage++;
             }
-        });
+        }, { threshold: 1.0 });
+
+        observer.observe(loadingTrigger);
     </script>
 </body>
 </html>

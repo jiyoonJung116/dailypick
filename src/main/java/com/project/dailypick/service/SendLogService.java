@@ -17,11 +17,9 @@ public class SendLogService {
         this.sendLogMapper = sendLogMapper;
     }
 
-    public List<SendLogDto> getSendLogList(String userName, String email, String phoneNumber, String isSuccess, int page, int size) {
+    public List<SendLogDto> getSendLogList(Long userId, String isSuccess, int page, int size) {
         Map<String, Object> param = new HashMap<>();
-        param.put("userName", userName);
-        param.put("email", email);
-        param.put("phoneNumber", phoneNumber);
+        param.put("userId", userId);
         param.put("isSuccess", isSuccess);
         param.put("page", page);
         param.put("size", size);
