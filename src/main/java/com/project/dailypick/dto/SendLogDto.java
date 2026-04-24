@@ -15,4 +15,7 @@ public class SendLogDto {
     private String alarmTime;
     private String isSuccess;
     private String deliveryDate;
+    private String newsTitle;
+    private String newsContent;
+    private String categoryName;
 }

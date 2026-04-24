@@ -27,4 +27,8 @@ public class SendLogService {
         
         return sendLogMapper.getSendLogList(param);
     }
+
+    public SendLogDto getSendLogDetail(Long userId, Long logId) {
+        return sendLogMapper.getSendLogDetail(userId, logId);
+    }
 }

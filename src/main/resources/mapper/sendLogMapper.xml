@@ -11,13 +11,26 @@
         <result property="alarmTime" column="alarm_time"/>
         <result property="isSuccess" column="is_success"/>
         <result property="deliveryDate" column="delivery_date"/>
+        <result property="newsTitle" column="news_title"/>
+        <result property="newsContent" column="news_content"/>
     </resultMap>
 
     <select id="getSendLogList" resultMap="SendLogMap" parameterType="map">
-        SELECT *
+        SELECT 
+            sl.id, 
+            sl.category_id_list,
+            sl.email, 
+            sl.is_success, 
+            sl.delivery_date,
+            sd.create_date,
+            sd.title AS news_title,      
+            sd.content AS news_content  
         FROM send_log sl
-        LEFT JOIN user u
+        LEFT JOIN user u 
         ON sl.user_id = u.id
+        LEFT JOIN summary_data sd 
+        ON DATE(sl.delivery_date) = DATE(sd.create_date)
+        AND sl.category_id_list LIKE CONCAT('%', sd.category_id, '%')
         <where>
             u.id = #{userId}
             <if test="isSuccess != null and isSuccess != 'ALL'">
@@ -26,5 +39,29 @@
         </where>
         ORDER BY alarm_time DESC
         LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="getSendLogDetail" resultMap="SendLogMap" parameterType="long">
+        SELECT 
+            sl.id, 
+            sl.category_id_list,
+            sl.email, 
+            sl.is_success, 
+            DATE_FORMAT(sl.delivery_date, '%Y-%m-%d') AS delivery_date,
+            sd.create_date,
+            c.category_name, 
+            sd.title AS news_title,      
+            sd.content AS news_content  
+        FROM send_log sl
+        LEFT JOIN user u 
+            ON sl.user_id = u.id
+        LEFT JOIN summary_data sd 
+            ON DATE(sl.delivery_date) = DATE(sd.create_date)
+        AND sl.category_id_list LIKE CONCAT('%', sd.category_id, '%')
+        LEFT JOIN category c 
+	        ON sd.category_id = c.id
+        WHERE sl.id = #{logId}
+        AND u.id = #{userId}
+        LIMIT 1
     </select>
 </mapper>

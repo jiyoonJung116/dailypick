@@ -29,6 +29,11 @@ public class SendLogController {
                             @RequestParam(name = "isSuccess", defaultValue = "ALL") String isSuccess,
                             @RequestParam(name = "page", defaultValue = "0") int page,
                             @RequestParam(name = "size", defaultValue = "10") int size) {
+        
+        if (session.getAttribute("userId") == null) {
+            return "redirect:/user/login";
+        }
+        
         try {
             Long userId = Long.parseLong(session.getAttribute("userId").toString());
             List<SendLogDto> sendLogList = sendLogService.getSendLogList(userId, isSuccess, page, size);
@@ -48,6 +53,20 @@ public class SendLogController {
                                         @RequestParam(name = "size", defaultValue = "15") int size) {
         Long userId = Long.parseLong(session.getAttribute("userId").toString());
         return sendLogService.getSendLogList(userId, isSuccess, page, size);
+    }
+
+    @GetMapping("detail")
+    public String getLogDetail(Model model, HttpSession session, @RequestParam("logId") Long logId) {
+        Object userObj = session.getAttribute("userId");
+        if (userObj == null) {
+            return "redirect:/login";
+        }
+
+        Long userId = Long.parseLong(session.getAttribute("userId").toString());
+        SendLogDto logDetail = sendLogService.getSendLogDetail(userId, logId);
+        model.addAttribute("log_detail", logDetail);
+
+        return "log_detail";
     }
     
 }

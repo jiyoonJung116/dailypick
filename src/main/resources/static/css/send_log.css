@@ -128,3 +128,33 @@ input[type="text"], select {
     color: var(--text-sub);
     font-size: 0.9rem;
 }
+
+/* 뉴스 내용 말줄임 처리 (1줄) */
+.content-cell {
+    max-width: 300px; /* 적절한 너비 설정 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.btn-detail {
+    padding: 6px 12px;
+    background-color: #f0f2f5;
+    color: #333;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: background 0.2s;
+}
+
+.btn-detail:hover {
+    background-color: #e4e6e9;
+    color: #000;
+}
+
+.history-table {
+    table-layout: fixed;
+    width: 100%;
+}
