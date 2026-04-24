@@ -61,7 +61,6 @@
         <section class="news-grid" id="newsBody">
         <th:block th:if="${not #lists.isEmpty(summary_list)}">
             <article class="news-card" th:each="news : ${summary_list}">
-                <div class="card-img" style="background-image: url('https://via.placeholder.com/400x250?text=DailyPick')"></div>
                 <div class="card-body">
                     <span class="cat-tag" th:text="${news.categoryName ?: '일반'}"></span>
                     <h3 class="card-title" th:text="${news.title ?: '제목 없음'}"></h3>
@@ -78,10 +77,22 @@
     </main>
 
     <script>
-        async function getNewsList() {
+        let page = 1;
+        let isFetching = false;
+
+        async function getNewsList(isNewSearch = false) {
+            if (isFetching) return;
+            
+            if (isNewSearch) {
+                page = 0;
+                document.getElementById('newsBody').innerHTML = '';
+            }
+
+            isFetching = true;
             const form = document.getElementById('combinedForm');
             const formData = new FormData(form);
             
+            formData.append('page', page); 
             const params = new URLSearchParams(formData).toString();
             
             try {
@@ -91,19 +102,18 @@
                 const newsBody = document.getElementById('newsBody');
                 const countText = document.getElementById('countText');
                 
-                countText.innerText = data.length;
-                
-                newsBody.innerHTML = '';
-                
+                if (isNewSearch) countText.innerText = data.length;
+                else countText.innerText = parseInt(countText.innerText) + data.length;
+
                 if (data.length === 0) {
-                    newsBody.innerHTML = '<div class="empty-msg">검색 결과가 없습니다.</div>';
+                    if (isNewSearch) newsBody.innerHTML = '<div class="empty-msg">검색 결과가 없습니다.</div>';
+                    isFetching = false;
                     return;
                 }
 
                 data.forEach(news => {
                     const card = `
                         <article class="news-card">
-                            <div class="card-img" style="background-image: url('https://via.placeholder.com/400x250?text=DailyPick')"></div>
                             <div class="card-body">
                                 <span class="cat-tag">${news.categoryName || '일반'}</span>
                                 <h3 class="card-title">${news.title || '제목 없음'}</h3>
@@ -114,11 +124,27 @@
                     `;
                     newsBody.insertAdjacentHTML('beforeend', card);
                 });
+
+                if (data.length < 10) { 
+                    isFetching = true; 
+                } else {
+                    page++;
+                }
+                page++;
             } catch (error) {
                 console.error('Error:', error);
-                alert('데이터를 불러오는 중 오류가 발생했습니다.');
+            } finally {
+                isFetching = false;
             }
         }
+
+        window.addEventListener('scroll', () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+                getNewsList();
+            }
+        });
+
+        document.querySelector('.btn-search').onclick = () => getNewsList(true);
     </script>
 </body>
 </html>

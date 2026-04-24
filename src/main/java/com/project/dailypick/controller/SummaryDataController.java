@@ -56,7 +56,13 @@ public class SummaryDataController {
     public List<SummaryDataDto> getNewsListData(
             @RequestParam(name = "categoryId") int categoryId,
             @RequestParam(name = "title") String title,
-            @RequestParam(name = "content") String content) {
-        return summaryDataService.getSummaryList(categoryId, title, content, 0, 10);
+            @RequestParam(name = "content") String content,
+            @RequestParam(name = "page", defaultValue = "0") int page) {
+
+        int size = 10;
+        int offset = page * size;
+        
+        List<SummaryDataDto> summaryList = summaryDataService.getSummaryList(categoryId, title, content, offset, size);
+        return summaryDataService.getSummaryList(categoryId, title, content, offset, size);
     }
 }

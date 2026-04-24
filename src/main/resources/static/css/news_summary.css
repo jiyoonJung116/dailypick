@@ -35,7 +35,8 @@ body { background-color: var(--bg-color); color: #333; }
 .cat-btn.active { background: var(--primary-color); color: #fff; }
 
 /* News Grid */
-.news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding-bottom: 50px; }
+.news-grid {display: grid;grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));gap: 20px;min-height: 500px; /* 로딩 중에도 영역 확보 */
+}
 .news-card { background: var(--card-bg); border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s; display: flex; flex-direction: column; }
 .news-card:hover { transform: translateY(-8px); }
 
