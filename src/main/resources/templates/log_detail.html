@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DailyPick - 메일 상세 내역</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/log_detail.css}">
+</head>
+<body>
+
+    <div class="mail-wrapper">
+        <div class="mail-top-bar"></div>
+        
+        <header class="mail-header">
+            <h1 class="mail-title" th:text="${log_detail.newsTitle}">오늘의 맞춤 뉴스 요약본이 도착했습니다.</h1>
+            <div style="display: flex; align-items: center;">
+                <div class="sender-info">
+                    <div class="sender-avatar">DP</div>
+                    <div class="sender-details">
+                        <p class="sender-name">DailyPick 알리미</p>
+                        <p class="receiver-email">To. <span th:text="${log_detail.email}"></span></p>
+                    </div>
+                </div>
+                <div class="mail-meta-right">
+                    <p th:text="${log_detail.deliveryDate}"></p>
+                </div>
+            </div>
+        </header>
+
+        <main class="mail-content">
+            <span class="content-label">Today's News Summary</span>
+            <div class="news-box">
+                <span class="category-badge">
+                    <i class="fas fa-tag"></i> <span th:text="${log_detail.categoryName ?: '전체'}"></span>
+                </span>
+                <div class="news-text" 
+                    th:utext="${#strings.replace(log_detail.newsContent, '. ', '.&lt;br /&gt;')}">
+                </div>
+            </div>
+        </main>
+
+        <footer class="mail-footer">
+            <div class="status-indicator"></div>
+            <a th:href="@{/log/list}" class="btn-list">
+                <i class="fas fa-list"></i> 목록으로
+            </a>
+        </footer>
+    </div>
+
+</body>
+</html>
